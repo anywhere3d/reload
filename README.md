@@ -1,1 +1,1 @@
-https://anywhere3d.github.io/reload3D/
+https://anywhere3d.github.io/reload/3d/
