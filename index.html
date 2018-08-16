@@ -351,50 +351,6 @@
             var object;
             var loader = new THREE.JSONLoader();
 //
-            loader.load( "models/HF_WeddingDress02_model.js", function(geometry, materials) 
-            {
-                 var material = new THREE.MeshFaceMaterial(materials);
-                 object = new THREE.Mesh(geometry, material);
-                 object.name = "WeddingDress02";
-                 object.scale.set(1.1, 1, 1.1);
-                 object.position.set(100, 0, 40);
-                 scene.add(object);
-                 targets.push(object);
-            });
-//
-            loader.load( "models/HF_FemaleEyes01_model.js", function(geometry, materials) 
-            {
-                 var material = new THREE.MeshFaceMaterial(materials);
-                 object = new THREE.Mesh(geometry, material);
-                 object.name = "FemaleEyes01";
-                 object.scale.set(1, 1, 1);
-                 object.position.set(100, 0, 40);
-                 scene.add(object);
-                 targets.push(object);
-            });
-//
-            loader.load( "models/HF_FemaleHairs01_model.js", function(geometry, materials) 
-            {
-                 var material = new THREE.MeshFaceMaterial(materials);
-                 object = new THREE.Mesh(geometry, material);
-                 object.name = "FemaleHairs01";
-                 object.scale.set(1, 1, 1);
-                 object.position.set(100, 0, 40);
-                 scene.add(object);
-                 targets.push(object);
-            });
-//
-            loader.load( "models/HF_FemaleBody01_model.js", function(geometry, materials) 
-            {
-                 var material = new THREE.MeshFaceMaterial(materials);
-                 object = new THREE.Mesh(geometry, material);
-                 object.name = "FemaleBody01";
-                 object.scale.set(1, 1, 1);
-                 object.position.set(100, 0, 40);
-                 scene.add(object);
-                 targets.push(object);
-            });
-//
             loader.load( "models/department-store.js", function(geometry, materials) 
             {
                  var material = new THREE.MeshFaceMaterial(materials);
@@ -478,32 +434,6 @@
                  scene.add(object);
                  targets.push(object);
             });
-//
-            loader.load( "models/canadian-coin.js", function(geometry, materials) 
-            {
-                 var material = new THREE.MeshFaceMaterial(materials);
-                 object = new THREE.Mesh(geometry, material);
-                 object.name = "canadian-coin";
-                 object.scale.set(10, 10, 10);
-                 object.position.set(0, 10, 0);
-                 object.rotation.set(-1.6, 0, 0.8);
-                 scene.add(object);
-                 targets.push(object);
-                 //console.log(object);
-            });
-//
-            loader.load( "models/dice-red.js", function(geometry, materials) 
-            {
-                 var material = new THREE.MeshFaceMaterial(materials);
-                 object = new THREE.Mesh(geometry, material);
-                 object.name = "dice-red";
-                 object.scale.set(1, 1, 1);
-                 object.position.set(350, 10, 90);
-                 object.rotation.set(-0.4, 1.2, 0);
-                 scene.add(object);
-                 targets.push(object);
-            });
-//
 //
             var materialFace = new THREE.MeshBasicMaterial( { color: 0xFFFFFF } );
         	var materialSide = new THREE.MeshBasicMaterial( { color: 0x999999 } );
@@ -634,7 +564,6 @@
         	scene.add(info3GeomMesh);
         	scene.add(info4GeomMesh);
 //
-//
             var labelGeom = new THREE.TextGeometry( "Office Building", h1Style );
         	var labelGeomMesh = new THREE.Mesh(labelGeom, textMaterial );
         	labelGeomMesh.scale.set( 1, 1, 1);
@@ -662,27 +591,6 @@
         	textMesh.position.set( 100 + (textWidth * 0.5), 100, 350 );
         	textMesh.rotation.y = -Math.PI;
         	scene.add(textMesh);
-//
-        	var textGeom = new THREE.TextGeometry( "Under Construction", h0Style );
-       		var textMaterial = new THREE.MeshFaceMaterial(materialArray);
-        	var textMesh = new THREE.Mesh(textGeom, textMaterial );
-        	textMesh.scale.set( 1, 1, 1);
-        	textGeom.computeBoundingBox();
-        	var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
-        	textMesh.position.set( 600, 150, -300 );
-        	textMesh.rotation.y = -Math.PI * 0.5;
-        	scene.add(textMesh);
-//
-        	var textGeom = new THREE.TextGeometry( "Under Construction", h1Style );
-       		var textMaterial = new THREE.MeshFaceMaterial(materialArray);
-        	var textMesh = new THREE.Mesh(textGeom, textMaterial );
-        	textMesh.scale.set( 1, 1, 1);
-        	textGeom.computeBoundingBox();
-        	var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
-        	textMesh.position.set( 0 - (textWidth * 0.5), 150, -600 );
-        	textMesh.rotation.y = 0;
-        	scene.add(textMesh);
-//
 //
             var textGeom = new THREE.TextGeometry( "Reload", h5Style );
         	reloadTextGeom = textGeom;
