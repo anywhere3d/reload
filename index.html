@@ -1,0 +1,1340 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+    <meta http-equiv="keywords" content="web 3D games, 3D games, online 3D games, web games, online games, FPS games" />
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+    <META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">
+    <meta http-equiv="description" content="web 3D games, 3D games, online 3D games, web games, online games, FPS games" />
+    <!--link href="/css/style.css" rel="stylesheet" type="text/css" / -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+    
+
+    <title>Reload-3D FPS</title>
+
+    <style>
+        canvas { width:100%; height:100% }
+        * {font-family: arial, sans-serif!important;}
+        body        {background-color:#000000; margin:0px;}
+        div         {color:#FFFFFF;}
+        #controls   {font-family:sans-serif; font-size:0.15e;}
+        #debugInfo  {position:absolute; background-color:#000000; opacity:0.5; font-size:5em; right:10px; bottom:10px; 
+                     border: 1px solid red; border-radius:10px; padding:0px 10px 5px 10px;}
+        #supplyInfo {position:absolute; font-size:2em; right:10px; bottom:110px; border: 1px solid red; border-radius:10px; padding:0px 10px 5px 10px;}
+        #population {position:absolute; font-size:2em; left:10px; top:10px; border: 1px solid red; border-radius:10px; padding:0px 10px 5px 10px;}
+        #enterInfo  {position:absolute; font-size:6em; max-top:40%; min-top:30%; bottom:50%; left:38%; right:38%; margin:auto;
+                     border: 1px solid red; border-radius:10px; text-align:center; text-vertical-align:middle;}
+        #developed  {position:absolute; left:10px; bottom:10px; border-radius:10px; padding:0px 5px 2px 5px; text-align:left; font-size:1em;}
+
+        span {color:#FFFFFF; position:relative; top:-10px; left:46px; font-family:sans-serif; text-align:center; font-size:0.6em; opacity:0.5;}
+        #draggable {width:150px; height:150px; position:absolute; border-radius:0.5em; border: 1px solid #FF0000; padding: 0.5em;}
+        #original {width:20px; height:auto; position:relative; top:-165px; left:155px; color:#FFFFFF; opacity:0.3;}
+        .toggler { width:auto; height:900px; }
+        #effect {position: relative;}
+    </style>
+
+</head>
+
+<body id="container">
+
+    <script src="js/three.js"></script>
+    <script src="js/FirstPersonControls_modified.js"></script>
+    <script src="js/Detector.js"></script>
+    <script src="js/Projector.js"></script>
+    <script src="js/KeyboardState.js"></script>
+    
+    <script src="js/gentilis_bold.typeface.js"></script>
+    <script src="js/gentilis_regular.typeface.js"></script>
+    <script src="js/optimer_bold.typeface.js"></script>
+    <script src="js/optimer_regular.typeface.js"></script>
+    <script src="js/helvetiker_bold.typeface.js"></script>
+    <script src="js/helvetiker_regular.typeface.js"></script>
+    <script src="js/droid_sans_regular.typeface.js"></script>
+    <script src="js/droid_sans_bold.typeface.js"></script>
+    <script src="js/droid_serif_regular.typeface.js"></script>
+    <script src="js/droid_serif_bold.typeface.js"></script>
+        
+    <script>
+//
+      var Ball;
+//
+      if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+//
+      var container, debugInfo, supplyInfo;
+      var camera, helpCamera, scene, renderer;
+      var controls;
+      var nofreeze = true;
+      var helpCameraActive = false;
+      var userSphere;
+      var cameraFrontPlane;
+      var DOME;
+      var arrow;
+      var newDirectionObj;
+      var speed = 1.2;
+//
+    	var light, light1, light2, camLight, laserLight;
+    	var material_sphere1, material_sphere2, material_usersph;
+    	var materialArray = [];
+    	var h0Style, h1Style, h2Style, h3Style, h4Style, h5Style, h6Style, h7Style, h8Style, infoStyle;
+//
+    	var bullets = [];
+    	var supplyOfBullets = 20;
+      var meshButtons = [];
+      var reloadButton;
+      var cnt = 0; 
+//
+      listener = new THREE.AudioListener();
+      soundDeath = new THREE.Audio( listener );
+      soundShot = new THREE.Audio( listener );
+    	soundSpawn = new THREE.Audio( listener );
+    	soundThunder = new THREE.Audio( listener );
+    	soundBreak = new THREE.Audio( listener );
+//
+    	var mouseHelper;
+    	var line;
+    	var ballPoint;
+    	var normals;
+//     
+      var keyboard = new KeyboardState();
+      var clock = new THREE.Clock();
+//
+      var reloadText = new THREE.Mesh();
+      var reloadTextGeom;
+      var reloadTextWidth;
+      var reloadText;
+//
+      var targets = [];
+      var projector;
+      var raycaster;
+      var mouse = new THREE.Vector2();
+      var spheres = [];
+      var spheresIndex = 0;
+//
+     	var sect = 1;
+      var intersects = [];
+//
+      var morphs = [];
+      var skins = [];
+      var othersAvatarSkins = [];
+      var directionRandomPoints = [];
+      var animation;
+      var avatarHelper;
+      var myAvatar;
+      var shootedEnemy = undefined;
+      var othersAvatar;
+      var xforward = true;
+      var zforward = true;
+//
+//
+        ////////////////////////////////////////////////////////////////////
+        // RUNTIME //
+        ////////////////////////////////////////////////////////////////////
+//
+//
+            init();
+//
+            animate();
+//
+//
+        ////////////////////////////////////////////////////////////////////
+        // END OF RUNTIME //
+        ////////////////////////////////////////////////////////////////////
+//
+//
+        function init() 
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        {           // start of inti() //
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+            //var debugInfo = document.getElementById( "debugInfo" );
+        
+            container = document.getElementById( "container" );
+            debugInfo = document.getElementById( "debugInfo" );
+            supplyInfo = document.getElementById( "supplyInfo" );
+//
+            camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+            // camera.position: THREE.Vector3 {x: 314.75944298736704, y: 65.44727034360473, z: 136.80147336826894}
+            camera.position.set( 315, 65, 135 );
+            // camera.rotation: THREE.Euler {_x: 0.04550062637322192, _y: 1.388640331380583, _z: -0.04474885158870413, _order: "XYZ"}
+            camera.rotation.set( 0.045, 1.388, -0.044, "XYZ" );
+            camera.name = "MAIN_CAMERA" ;
+            console.log(camera);
+//
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2( 0x000000, 0.0035 );
+            //scene.add( new THREE.AmbientLight( 0x000000 ) );
+//
+            light = new THREE.DirectionalLight( 0xffffff );
+            light.position.set( 0, 0, 1000 );
+            light.intensity = 0.25;
+            scene.add( light );
+//
+            light1 = new THREE.DirectionalLight( 0xffffff );
+            light1.position.set( 1000, 0, -1000 );
+            light1.intensity = 0.25;
+            scene.add( light1 );
+//
+            light2 = new THREE.DirectionalLight( 0xffffff );
+            light2.position.set( -1000, 1000, 1000 );
+            light2.intensity = 1;
+            scene.add( light2 );
+//
+            laserLight = new THREE.PointLight( 0x00ff44, 0.1, 10 );
+            laserLight.position.copy( camera.position );
+            laserLight.intensity = 2;
+            scene.add( laserLight );
+//
+            var r = 2;
+            var sphere = new THREE.SphereGeometry( r, 256, 128 );
+            var sprite = new THREE.SphereGeometry( 1, 16, 8 );
+//
+            material_sphere1 = new THREE.MeshLambertMaterial( { color: 0xffaa00, shading: THREE.SmoothShading } );
+            material_sphere2 = new THREE.MeshLambertMaterial( { color: 0xff2200, shading: THREE.SmoothShading } );
+            material_usersph = new THREE.MeshLambertMaterial( { color: 0x99ff00, shading: THREE.SmoothShading } );
+            material_bullets = new THREE.MeshLambertMaterial( { color: 0xff0000, shading: THREE.SmoothShading } );
+            material_doubleSide = new THREE.MeshLambertMaterial( { color: 0xaaaaaa, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
+            // faceColorMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, vertexColors: THREE.FaceColors } );
+            // material_bullets = new THREE.MeshBasicMaterial( { color: 0xff0000, vertexColors: THREE.FaceColors } );
+            material_helpers = new THREE.MeshBasicMaterial( { color: 0x88ff00, wireframe: true, transparent: true } );
+//
+            soundDeath.load( 'sounds/death.ogg' );
+    	    soundShot.load( 'sounds/shot.ogg' );
+    	    soundSpawn.load( 'sounds/spawn.ogg' );
+    	    soundThunder.load( 'sounds/thunder.ogg' );
+    	    soundBreak.load( 'sounds/break.ogg' );
+//
+            var groundHelper = new THREE.GridHelper( 1000, 10 );
+            groundHelper.color1.setHex( 0x444444 );
+            groundHelper.color2.setHex( 0x444444 );
+            groundHelper.position.y = 0.00;
+            scene.add( groundHelper );
+//
+            var geometry = new THREE.SphereGeometry( 100, 32, 16 );
+    	    var material = new THREE.MeshBasicMaterial( { color: 0x88ff00, wireframe: true, transparent: true, side: THREE.DoubleSide } );
+    	    DOME = new THREE.Mesh( geometry, material );
+            DOME.name = "DOME";
+            DOME.position.set( 0, 0, 0 );
+            DOME.scale.set(10, 5, 10);
+            scene.add( DOME );
+            targets.push(DOME);
+//
+//
+            var s = 2;
+            var object;
+            var loader = new THREE.JSONLoader(); 
+            loader.load( "models/user-sphere.js", function(geometry, materials) 
+            {
+                 var material = new THREE.MeshFaceMaterial( materials );
+                 object = new THREE.Mesh( geometry, material_helpers );
+                 object.name = "USER_SPHERE" ;
+                 object.position.copy( camera.position );
+                 object.scale.set(s, s, s);
+                 object.scale.z = 20;
+                 object.visible = false;
+                 scene.add(object);
+                 userSphere = scene.children[scene.children.length - 1];;
+            });
+//
+            loader.load( "models/cameraFrontPlane.js", function(geometry, materials) 
+            {
+                 var material = new THREE.MeshFaceMaterial( materials );
+                 object = new THREE.Mesh( geometry, material_helpers );
+                 object.name = "CAMERA_F_PLANE" ;
+                 object.position.copy( camera.position );
+                 object.scale.set(30, 20, 5);
+                 object.visible = false;
+                 scene.add(object);
+                 cameraFrontPlane = scene.children[scene.children.length - 1];
+                 targets.push(cameraFrontPlane);
+            });
+//
+            loader.load( "models/arrow.js", function(geometry, materials) 
+            {
+                 var material = new THREE.MeshFaceMaterial(materials);
+                 object = new THREE.Mesh(geometry, material);
+                 object.name = "DIRECTION_ARROW";
+                 object.position.set( -100, 10, 15 );
+                 object.scale.set(0.7, 1, 1.5);
+                 object.visible = true;
+                 scene.add(object);
+                 arrow = scene.children[scene.children.length - 1];
+            });
+//
+//
+    	    for (var i = 0; i < supplyOfBullets; i++)
+    	    {
+        		var bullet = new THREE.Mesh( new THREE.SphereGeometry( 0.3, 16, 8 ), material_bullets );
+        		bullet.name = "BULLET_" + i ;
+        		bullet.position.set( 0, 0, 0 );
+        		bullet.visible = false;
+        		scene.add( bullet );
+        		bullets.push( bullet );
+            }
+//
+            var geometry = new THREE.SphereGeometry( 2, 8, 4 );
+            var material = new THREE.MeshBasicMaterial( {color: 0xffff00, wireframe: true, transparent: true } );
+            newDirectionObj = new THREE.Mesh( geometry, material );
+            newDirectionObj.name = "NEW_DIRECTION_OBJECT";
+            newDirectionObj.position.set(200, 15, 200);
+            newDirectionObj.visible = false;
+            scene.add( newDirectionObj );
+//
+            Ball = new THREE.Mesh( sphere, material_sphere1 );
+            Ball.name = "AXIS_BALL";
+            Ball.position.set( 0, 2, 0 );
+            scene.add( Ball );
+            targets.push(Ball);
+            
+            Ball = new THREE.Mesh( sphere, material_sphere2 );
+            Ball.name = "BALL";
+            Ball.position.set( 350, 2, 90 );
+            scene.add( Ball );
+            targets.push(Ball);
+//
+            var geometry = new THREE.SphereGeometry( 0.2, 8, 4 );
+            var material = new THREE.MeshBasicMaterial( {color: 0xffffff} );
+            ballPoint = new THREE.Mesh( geometry, material );
+    		ballPoint.name = "POINT_BALL";
+    		ballPoint.position.set( 0, 0, 0 );
+    		ballPoint.visible = false;
+    		scene.add( ballPoint );
+//
+            // MOUSE HELPER
+            //raycaster = new THREE.Raycaster();
+			mouseHelper = new THREE.Mesh( new THREE.BoxGeometry( 5, 0.05, 5 ), new THREE.MeshNormalMaterial() );
+			mouseHelper.visible = false;
+			scene.add( mouseHelper );
+//
+			var geometry = new THREE.Geometry();
+            var material = new THREE.LineBasicMaterial({ linewidth: 20 });
+            line = new THREE.Line( geometry, material );
+			line.geometry.vertices.push( new THREE.Vector3( 0, 0, 0 ) );
+			line.geometry.vertices.push( new THREE.Vector3( 0, 0, 0 ) );
+			line.frustumCulled = false;
+			scene.add( line );
+//
+    	    reloadButton = new THREE.Group();
+    	    reloadButton.position.y = 18;
+            reloadButton.name = "BUTTON_GROUP";
+    	    scene.add( reloadButton );
+//
+            var mybullet;
+            var loader = new THREE.JSONLoader(); 
+            loader.load( "models/bullet.js", function(geometry, materials) 
+            {
+                var material = new THREE.MeshFaceMaterial(materials);
+                var object = new THREE.Mesh(geometry, material);
+                object.name = "RELOAD_BULLET";
+                object.position.set( 0, 0, 0 );
+                object.scale.set(30, 30, 30);
+                object.visible = true;
+                scene.add(object);
+                mybullet = scene.children[scene.children.length - 1];
+//
+                for ( var i = 0; i < 20; i ++ ) 
+                {
+        		    var object = mybullet.clone();
+        		    object.position.z = ( i % 5 ) * 0.9 - 1.8;
+        		    object.position.x = Math.floor( i / 5 ) * 0.9 - 1.8;
+        		    reloadButton.add(object);
+                    meshButtons.push( object );
+        		}
+        		mybullet.visible = false;
+            });
+//
+            initOtherUsersAvatar();
+//
+            initMyAvatar();
+//
+            var object;
+            var loader = new THREE.JSONLoader();
+//
+            loader.load( "models/HF_WeddingDress02_model.js", function(geometry, materials) 
+            {
+                 var material = new THREE.MeshFaceMaterial(materials);
+                 object = new THREE.Mesh(geometry, material);
+                 object.name = "WeddingDress02";
+                 object.scale.set(1.1, 1, 1.1);
+                 object.position.set(100, 0, 40);
+                 scene.add(object);
+                 targets.push(object);
+            });
+//
+            loader.load( "models/HF_FemaleEyes01_model.js", function(geometry, materials) 
+            {
+                 var material = new THREE.MeshFaceMaterial(materials);
+                 object = new THREE.Mesh(geometry, material);
+                 object.name = "FemaleEyes01";
+                 object.scale.set(1, 1, 1);
+                 object.position.set(100, 0, 40);
+                 scene.add(object);
+                 targets.push(object);
+            });
+//
+            loader.load( "models/HF_FemaleHairs01_model.js", function(geometry, materials) 
+            {
+                 var material = new THREE.MeshFaceMaterial(materials);
+                 object = new THREE.Mesh(geometry, material);
+                 object.name = "FemaleHairs01";
+                 object.scale.set(1, 1, 1);
+                 object.position.set(100, 0, 40);
+                 scene.add(object);
+                 targets.push(object);
+            });
+//
+            loader.load( "models/HF_FemaleBody01_model.js", function(geometry, materials) 
+            {
+                 var material = new THREE.MeshFaceMaterial(materials);
+                 object = new THREE.Mesh(geometry, material);
+                 object.name = "FemaleBody01";
+                 object.scale.set(1, 1, 1);
+                 object.position.set(100, 0, 40);
+                 scene.add(object);
+                 targets.push(object);
+            });
+//
+            loader.load( "models/department-store.js", function(geometry, materials) 
+            {
+                 var material = new THREE.MeshFaceMaterial(materials);
+                 object = new THREE.Mesh(geometry, material);
+                 object.name = "department-store";
+                 object.scale.set(5, 5, 5);
+                 object.position.set(150, 0, -50);
+                 object.rotation.set(0, 0, 0);
+                 scene.add(object);
+                 targets.push(object);
+            });
+//
+            loader.load( "models/office_building_500.js", function(geometry, materials) 
+            {
+                 var material = new THREE.MeshFaceMaterial(materials);
+                 object = new THREE.Mesh(geometry, material);
+                 object.name = "office-building";
+                 object.scale.set(3.5, 3.5, 3.5);
+                 object.position.set(-200, 0, -100);
+                 object.rotation.set(0, Math.PI, 0);
+                 scene.add(object);
+                 targets.push(object);
+            });
+//
+            loader.load( "models/barcelona-pavilion.js", function(geometry, materials) 
+            {
+                 var material = new THREE.MeshFaceMaterial(materials);
+                 object = new THREE.Mesh(geometry, material);
+                 object.name = "barcelona-pavilion";
+                 object.scale.set(10, 10, 10);
+                 object.position.set(0, 20, 400);
+                 object.rotation.set(0, Math.PI, 0);
+                 scene.add(object);
+                 targets.push(object);
+            });
+//
+            loader.load( "models/robie-house.js", function(geometry, materials) 
+            {
+                 var material = new THREE.MeshFaceMaterial(materials);
+                 object = new THREE.Mesh(geometry, material_doubleSide);
+                 object.name = "robie-house";
+                 object.scale.set(10, 10, 10);
+                 object.position.set(650, 0, 0);
+                 object.rotation.set(0, -Math.PI * 0.5, 0);
+                 scene.add(object);
+                 targets.push(object);
+            });
+//
+            loader.load( "models/schroder-house.js", function(geometry, materials) 
+            {
+                 var material = new THREE.MeshFaceMaterial(materials);
+                 object = new THREE.Mesh(geometry, material);
+                 object.name = "schroder-house";
+                 object.scale.set(0.3, 0.3, 0.3);
+                 object.position.set(100, 0, -300);
+                 object.rotation.set(0, -0.3, 0);
+                 scene.add(object);
+                 targets.push(object);
+            });
+//
+            loader.load( "models/villa-savoye.js", function(geometry, materials) 
+            {
+                 var material = new THREE.MeshFaceMaterial(materials);
+                 object = new THREE.Mesh(geometry, material_doubleSide);
+                 object.name = "villa-savoye";
+                 object.scale.set(0.3, 0.3, 0.3);
+                 object.position.set(0, 0, -600);
+                 object.rotation.set(0, 0, 0);
+                 scene.add(object);
+                 targets.push(object);
+            });
+
+            loader.load( "models/hotshot-building.js", function(geometry, materials) 
+            {
+                 var material = new THREE.MeshFaceMaterial(materials);
+                 object = new THREE.Mesh(geometry, material);
+                 object.name = "hotshot-building";
+                 object.scale.set(10, 10, 10);
+                 object.position.set(-750, -31, 250);
+                 object.rotation.set(0, Math.PI * 0.5, 0);
+                 scene.add(object);
+                 targets.push(object);
+            });
+//
+            loader.load( "models/canadian-coin.js", function(geometry, materials) 
+            {
+                 var material = new THREE.MeshFaceMaterial(materials);
+                 object = new THREE.Mesh(geometry, material);
+                 object.name = "canadian-coin";
+                 object.scale.set(10, 10, 10);
+                 object.position.set(0, 10, 0);
+                 object.rotation.set(-1.6, 0, 0.8);
+                 scene.add(object);
+                 targets.push(object);
+                 //console.log(object);
+            });
+//
+            loader.load( "models/dice-red.js", function(geometry, materials) 
+            {
+                 var material = new THREE.MeshFaceMaterial(materials);
+                 object = new THREE.Mesh(geometry, material);
+                 object.name = "dice-red";
+                 object.scale.set(1, 1, 1);
+                 object.position.set(350, 10, 90);
+                 object.rotation.set(-0.4, 1.2, 0);
+                 scene.add(object);
+                 targets.push(object);
+            });
+//
+//
+            var materialFace = new THREE.MeshBasicMaterial( { color: 0xFFFFFF } );
+        	var materialSide = new THREE.MeshBasicMaterial( { color: 0x999999 } );
+        	var materialArray = [ materialFace, materialSide ];
+//
+        	h0Style =  
+                {
+        		size: 40, height: 2, curveSegments: 10,
+        		font: "helvetiker", weight: "normal", style: "normal",
+        		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
+        		material: 0, extrudeMaterial: 1
+        	}
+//
+        	h1Style = 
+                {
+        		size: 20, height: 1, curveSegments: 10,
+        		font: "helvetiker", weight: "normal", style: "normal",
+        		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
+        		material: 0, extrudeMaterial: 1
+        	}
+//
+        	h2Style = 
+                {      
+        		size: 10, height: 1, curveSegments: 10,
+        		font: "helvetiker", weight: "normal", style: "normal",
+        		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
+        		material: 0, extrudeMaterial: 1
+        	}
+//
+        	h3Style = 
+                {      
+        		size: 5, height: 0.5, curveSegments: 10,
+        		font: "helvetiker", weight: "normal", style: "normal",
+        		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
+        		material: 0, extrudeMaterial: 1
+        	}
+//
+        	h4Style = 
+                {      
+        		size: 2.5, height: 0.4, curveSegments: 10,
+        		font: "helvetiker", weight: "normal", style: "normal",
+        		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
+        		material: 0, extrudeMaterial: 1
+        	}
+//
+        	h5Style = 
+                {      
+        		size: 1.75, height: 0.3, curveSegments: 10,
+        		font: "helvetiker", weight: "normal", style: "normal",
+        		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
+        		material: 0, extrudeMaterial: 1
+        	}
+//
+        	h6Style = 
+                {      
+        		size: 1, height: 0.2, curveSegments: 10,
+        		font: "helvetiker", weight: "normal", style: "normal",
+        		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
+        		material: 0, extrudeMaterial: 1
+        	}
+//
+        	h7Style = 
+                {      
+        		size: 0.5, height: 0.1, curveSegments: 10,
+        		font: "helvetiker", weight: "normal", style: "normal",
+        		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
+        		material: 0, extrudeMaterial: 1
+        	}
+//
+        	h8Style = 
+                {      
+        		size: 0.25, height: 0.1, curveSegments: 10,
+        		font: "helvetiker", weight: "normal", style: "normal",
+        		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
+        		material: 0, extrudeMaterial: 1
+        	}
+//
+        	infoStyle = 
+                {
+        		size: 0.6, height: 0.1, curveSegments: 10,
+        		font: "helvetiker", weight: "normal", style: "normal",
+        		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
+        		material: 0, extrudeMaterial: 1
+        	};
+//
+//
+            var info0Geom = new THREE.TextGeometry( "CONTROLS:", infoStyle );
+        	var info1Geom = new THREE.TextGeometry( "A S D W = Move left, back, right, front.", infoStyle );
+        	var info2Geom = new THREE.TextGeometry( "LEFT CLICK = Forward.", infoStyle );
+        	var info3Geom = new THREE.TextGeometry( "RIGHT CLICK = Backward.", infoStyle );
+        	var info4Geom = new THREE.TextGeometry( "POINTER: Look at left, right, up, down.", infoStyle );
+//
+        	var textMaterial = new THREE.MeshFaceMaterial(materialArray);
+//
+        	var info0GeomMesh = new THREE.Mesh(info0Geom, textMaterial );
+        	var info1GeomMesh = new THREE.Mesh(info1Geom, textMaterial );
+        	var info2GeomMesh = new THREE.Mesh(info2Geom, textMaterial );
+        	var info3GeomMesh = new THREE.Mesh(info3Geom, textMaterial );
+        	var info4GeomMesh = new THREE.Mesh(info4Geom, textMaterial );
+//
+        	info0Geom.computeBoundingBox();
+        	info1Geom.computeBoundingBox();
+        	info2Geom.computeBoundingBox();
+        	info3Geom.computeBoundingBox();
+        	info4Geom.computeBoundingBox();
+//
+        	var info0Width = info0Geom.boundingBox.max.x - info0Geom.boundingBox.min.x;
+        	var info1Width = info1Geom.boundingBox.max.x - info1Geom.boundingBox.min.x;
+        	var info2Width = info2Geom.boundingBox.max.x - info2Geom.boundingBox.min.x;
+        	var info3Width = info3Geom.boundingBox.max.x - info3Geom.boundingBox.min.x;
+        	var info4Width = info4Geom.boundingBox.max.x - info4Geom.boundingBox.min.x;
+//
+        	info0GeomMesh.position.set( 170, 19, 50 );
+        	info1GeomMesh.position.set( 170, 18, 50 );
+        	info2GeomMesh.position.set( 170, 17, 50 );
+        	info3GeomMesh.position.set( 170, 16, 50 );
+        	info4GeomMesh.position.set( 170, 15, 50 );
+//
+        	info0GeomMesh.rotation.y = -Math.PI * 0.5;
+        	info1GeomMesh.rotation.y = -Math.PI * 0.5;
+        	info2GeomMesh.rotation.y = -Math.PI * 0.5;
+        	info3GeomMesh.rotation.y = -Math.PI * 0.5;
+        	info4GeomMesh.rotation.y = -Math.PI * 0.5;
+//
+        	scene.add(info0GeomMesh);
+        	scene.add(info1GeomMesh);
+        	scene.add(info2GeomMesh);
+        	scene.add(info3GeomMesh);
+        	scene.add(info4GeomMesh);
+//
+//
+            var labelGeom = new THREE.TextGeometry( "Office Building", h1Style );
+        	var labelGeomMesh = new THREE.Mesh(labelGeom, textMaterial );
+        	labelGeomMesh.scale.set( 1, 1, 1);
+        	labelGeom.computeBoundingBox();
+        	var labelWidth = labelGeom.boundingBox.max.x - labelGeom.boundingBox.min.x;
+        	labelGeomMesh.position.set( -250, 120, 70 );
+        	labelGeomMesh.rotation.y =  Math.PI * 0.25;
+        	scene.add(labelGeomMesh);
+//
+        	var labelGeom = new THREE.TextGeometry( "Store", h1Style );
+        	var labelGeomMesh = new THREE.Mesh(labelGeom, textMaterial );
+        	labelGeomMesh.scale.set( 1, 1, 1); 
+        	labelGeom.computeBoundingBox();
+        	var labelWidth = labelGeom.boundingBox.max.x - labelGeom.boundingBox.min.x;
+        	labelGeomMesh.position.set( 120, 120, -30 );
+        	labelGeomMesh.rotation.y =  0;
+        	scene.add(labelGeomMesh); 
+//
+        	var textGeom = new THREE.TextGeometry( "www.doublechok.com", h2Style );
+       		var textMaterial = new THREE.MeshFaceMaterial(materialArray);
+        	var textMesh = new THREE.Mesh(textGeom, material_sphere1 );
+        	textMesh.scale.set( 1, 1, 1);
+        	textGeom.computeBoundingBox();
+        	var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
+        	textMesh.position.set( 100 + (textWidth * 0.5), 100, 350 );
+        	textMesh.rotation.y = -Math.PI;
+        	scene.add(textMesh);
+//
+        	var textGeom = new THREE.TextGeometry( "Under Construction", h0Style );
+       		var textMaterial = new THREE.MeshFaceMaterial(materialArray);
+        	var textMesh = new THREE.Mesh(textGeom, textMaterial );
+        	textMesh.scale.set( 1, 1, 1);
+        	textGeom.computeBoundingBox();
+        	var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
+        	textMesh.position.set( 600, 150, -300 );
+        	textMesh.rotation.y = -Math.PI * 0.5;
+        	scene.add(textMesh);
+//
+        	var textGeom = new THREE.TextGeometry( "Under Construction", h1Style );
+       		var textMaterial = new THREE.MeshFaceMaterial(materialArray);
+        	var textMesh = new THREE.Mesh(textGeom, textMaterial );
+        	textMesh.scale.set( 1, 1, 1);
+        	textGeom.computeBoundingBox();
+        	var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
+        	textMesh.position.set( 0 - (textWidth * 0.5), 150, -600 );
+        	textMesh.rotation.y = 0;
+        	scene.add(textMesh);
+//
+//
+            var textGeom = new THREE.TextGeometry( "Reload", h5Style );
+        	reloadTextGeom = textGeom;
+       		var textMaterial = new THREE.MeshFaceMaterial(materialArray);
+        	var textMesh = new THREE.Mesh(textGeom, textMaterial );
+        	textMesh.scale.set( 1, 1, 1);
+        	textMesh.quaternion.copy(camera.quaternion);
+        	textGeom.computeBoundingBox();
+        	var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
+        	reloadTextWidth = textWidth;
+            textMesh.position.set( reloadTextWidth * 0.5, 0, 0 );
+        	textMesh.quaternion.copy( camera.quaternion );
+        	textMesh.visible = false;
+        	scene.add(textMesh);
+            reloadText = scene.children[scene.children.length - 1];
+            reloadText.geometry.center();
+//
+        	projector = new THREE.Projector();
+//
+            controls = new THREE.FirstPersonControls( camera );
+            controls.movementSpeed = 50;
+            controls.lookSpeed = 0.05;
+            controls.noFly = true;
+            controls.lookVertical = true;
+            controls.enabled = false;
+//
+            renderer = new THREE.WebGLRenderer( { antialias: true } );
+            renderer.shadowMapEnabled = true;
+    		renderer.setPixelRatio( window.devicePixelRatio );
+    		renderer.setSize( window.innerWidth, window.innerHeight );
+    		container.innerHTML = "";
+    		container.appendChild( renderer.domElement );
+//
+            window.addEventListener( 'resize', onWindowResize, false );
+        	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+        	document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+            document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+//
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        }           // end of inti() //
+        /////////////////////////////////////////////////////////////////////////////////////////////
+//
+        function ensureLoop( animation ) 
+        {
+    	    for ( var i = 0; i < animation.hierarchy.length; i ++ ) 
+            {
+                var bone = animation.hierarchy[ i ];
+                var first = bone.keys[ 0 ];
+                var last = bone.keys[ bone.keys.length - 1 ];
+                last.pos = first.pos;
+                last.rot = first.rot;
+                last.scl = first.scl;
+    	    }
+    	}
+//
+        function initOtherUsersAvatar()
+        {
+    	    var loader = new THREE.JSONLoader();
+//
+    	    loader.load( "models/human_walk_0_female.js", function ( geometry, materials ) 
+            {
+            	geometry.computeVertexNormals();
+            	geometry.computeBoundingBox();
+            	ensureLoop( geometry.animation );
+//
+            	for ( var i = 0, il = materials.length; i < il; i ++ ) 
+                {
+            	    var originalMaterial = materials[ i ];
+            	    originalMaterial.skinning = true;
+            	    originalMaterial.map = undefined;
+            	    originalMaterial.shading = THREE.SmoothShading;
+            	    originalMaterial.color.setHSL( THREE.Math.random16(), 1, 1 );
+             	    //originalMaterial.color.setHSL( 1, 1, 1 );
+            	    originalMaterial.specular.setHSL( 1, 1, 1 );
+            	    originalMaterial.shininess = 75;
+            	    originalMaterial.wrapAround = true;
+            	    originalMaterial.wrapRGB.set( 1, 1, 1 );
+            	}
+//
+            	var s = 4.5;
+            	var material = new THREE.MeshFaceMaterial( materials );
+            	var mesh = new THREE.SkinnedMesh( geometry, material, false );
+            	mesh.name = "JOHN_SMITH"
+            	mesh.scale.set( s, s, s );
+            	mesh.rotation.y = THREE.Math.randFloatSpread( Math.PI ); // direction of the avatar ?
+            	mesh.position.x = THREE.Math.randInt( -100, 100 );
+            	mesh.position.y = -geometry.boundingBox.min.y * s ;
+            	mesh.position.z = THREE.Math.randInt( -100, 100 );
+//
+                mesh.userData.delta = THREE.Math.randInt( 15, 30 );;
+                mesh.userData.enemy = true;
+                mesh.userData.friend = false;
+                mesh.userData.nickName = "John Smith";
+                mesh.userData.armed = true;
+                mesh.userData.supplyOfBullets = supplyOfBullets;
+//
+            	scene.add( mesh );
+            	othersAvatarSkins.push( mesh );
+        		mesh.visible = true;
+                targets.push( mesh );
+//
+            	animation = new THREE.Animation( mesh, geometry.animation );
+            	animation.play();
+            	animation.update( 0 );
+//
+                // DIRECTION POINT 
+                var directionRandomPoint = new THREE.Vector3( THREE.Math.randInt( -200, 200 ), mesh.position.y, THREE.Math.randInt( -200, 200 ) );
+            	directionRandomPoints.push( directionRandomPoint );
+    	    });
+        }
+//
+//
+//
+//
+        function initMyAvatar() 
+        {
+	    var loader = new THREE.JSONLoader();
+//
+	    loader.load( "models/human_walk_0_female.js", function ( geometry, materials ) 
+	    {
+	        geometry.computeVertexNormals();
+	        geometry.computeBoundingBox();
+	        ensureLoop( geometry.animation );
+//
+	        for ( var i = 0, il = materials.length; i < il; i ++ ) 
+            {
+                var originalMaterial = materials[ i ];
+                originalMaterial.skinning = true;
+                originalMaterial.map = undefined;
+                originalMaterial.shading = THREE.SmoothShading;
+                originalMaterial.color.setHSL( 0.2, 0.5, 0.7 );
+                originalMaterial.specular.setHSL( 0, 0, 0.1 );
+                originalMaterial.shininess = 75;
+                originalMaterial.wrapAround = true;
+                originalMaterial.wrapRGB.set( 1, 0.5, 0.5 );
+            }
+//
+            var s = 4.5;
+            var material = new THREE.MeshFaceMaterial( materials );
+            var mesh = new THREE.SkinnedMesh( geometry, material, false );
+            mesh.scale.set( s, s, s );
+            mesh.rotation.y = Math.PI/2;
+            mesh.position.x = -150;
+            mesh.position.y = -geometry.boundingBox.min.y * s ;
+            mesh.position.z = -15;
+//
+            mesh.userData.delta = 20;
+            mesh.userData.enemy = false;
+            mesh.userData.friend = true;
+            mesh.userData.nickName = "DoubleChok";
+            mesh.userData.armed = true;
+            mesh.userData.supplyOfBullets = supplyOfBullets;
+//
+            scene.add( mesh );
+            skins.push( mesh );
+            myAvatar = scene.children[scene.children.length - 1];
+            myAvatar.visible = !myAvatar.userData.armed;
+//
+            avatarHelper = new THREE.BoundingBoxHelper( myAvatar, 0X00ff00 );
+            scene.add( avatarHelper );
+            avatarHelper.visible = false;
+//
+            animation = new THREE.Animation( mesh, geometry.animation );
+            animation.play();
+            animation.update( 0 );
+//
+	    } );
+        }
+//
+//
+        function createNewBullet()
+        {
+    	    var bullet = new THREE.Mesh( new THREE.SphereGeometry( 0.3, 16, 8 ), material_bullets );
+    	    bullet.name = "BULLET_" + bullets.length ;
+    	    bullet.position.set( 0, 0, 0 );
+    	    bullet.visible = false;
+    	    scene.add( bullet );
+    	    bullets.push( bullet );
+        }
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+                                    // three.js functions //
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+        var bulletmsg = "start shooting";
+        var near = 0;
+        var far = Infinity;
+        var machinegun = false;
+//
+        function onDocumentMouseDown( event ) 
+        {
+            
+            if (cnt < bullets.length && cnt > -1)
+            {
+                if (machinegun)
+                {
+                    soundShot.play();
+                    soundShot.onEnded();
+                }
+                else
+                {
+                    soundBreak.play();
+                    soundBreak.onEnded();
+                }
+            }
+            else
+            {
+                soundSpawn.play();
+                soundSpawn.onEnded();
+            }
+//
+            //mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+            //mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+            var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
+            vector.unproject( camera );
+            var ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize(), near, far );
+//
+            intersects = ray.intersectObjects( targets );
+            // DO NOT EDIT
+            if ( intersects.length > sect )
+            {
+                laserLight.color = new THREE.Color(0xff0000);
+//
+                if (cnt < bullets.length && cnt > -1)
+                {
+                    myAvatar.userData.shootedObj = intersects[sect];
+                    bullets[cnt].visible = false;
+                    bullets[cnt].position.copy( intersects[sect].point );
+//
+                    if (myAvatar.userData.shootedObj.object.type == "SkinnedMesh") {
+                        if (myAvatar.userData.shootedObj.object.userData.enemy) {
+                            if (myAvatar.userData.shootedObj.object.userData.armed) {
+                                shootedEnemy = myAvatar.userData.shootedObj.object;
+                                for (var i = 0; i < directionRandomPoints.length; i++) directionRandomPoints[i] = new THREE.Vector3(THREE.Math.randInt( -200, 200 ), 
+                                    shootedEnemy.position.y, THREE.Math.randInt( -200, 200 ) );
+                                for (var i = 0; i < shootedEnemy.material.materials.length; i ++) {shootedEnemy.material.materials[i].color.setHex( 0xcc0000 )};
+                                shootedEnemy.userData.supplyOfBullets-- ;
+                                myAvatar.userData.supplyOfBullets++ ;
+                    } } }
+//
+                }
+            }
+        }
+//
+//
+        function onDocumentMouseUp( event ) 
+        {
+//
+            //mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+            //mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+            var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
+            vector.unproject( camera );
+            var ray  = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize(), near, far );
+/*
+            // 3D Mesh Button Reload with mouse click. //
+            intersects = ray.intersectObjects( meshButtons );
+            if (intersects.length > 0 && cnt > bullets.length - 1)
+            {
+                clickToReload();
+                return;
+            }
+*/
+           intersects = ray.intersectObjects( targets );
+            if ( intersects.length == 2 )
+//
+            {
+                if (cnt > bullets.length - 1) 
+                {
+                    bulletmsg = "empty";
+                    reloadText.quaternion.copy( camera.quaternion );
+                    reloadText.position.copy( intersects[0].point );
+                    reloadText.visible = true;
+                    vector.unproject( reloadText );
+                    myAvatar.visible = true;
+                }
+                else if (cnt < bullets.length + 1 && cnt > -1)
+                {
+                    bullets[cnt].visible = true;
+                    bulletmsg = bullets.length - cnt;
+                }
+                else
+                {
+                    bulletmsg = "report bug 1a";
+                }
+            }
+//
+            else if ( intersects.length > sect )
+//
+            {
+                if (cnt > bullets.length - 1) 
+                {
+                    bulletmsg = "empty";
+                    reloadText.quaternion.copy( camera.quaternion );
+                    reloadText.position.copy( intersects[0].point );
+                    reloadText.visible = true;
+                    vector.unproject( reloadText );
+                    cnt = -1;
+                }
+                else if (cnt < bullets.length + 1 && cnt > -1)
+                {
+                    bullets[cnt].visible = true;
+//
+                    if (myAvatar.userData.shootedObj.object.type == "SkinnedMesh") {
+                        if (myAvatar.userData.shootedObj.object.userData.enemy) {
+                            if (myAvatar.userData.shootedObj.object.userData.armed) {
+                                // add some code to do something when you hit enemy ???
+                    }   }   }
+                    else 
+                    { 
+                        cnt++ ; 
+                    }
+//
+                    bulletmsg = bullets.length - cnt;
+                }
+                else
+                {
+                    bulletmsg = "report bug 1b";
+                }
+//
+             }
+//
+             if (cnt > bullets.length -1) 
+             {
+                 myAvatar.visible = true;
+                 myAvatar.userData.armed = false;
+             }
+             if (cnt < bullets.length && cnt > -1) 
+             {
+                 myAvatar.visible = false;
+                 myAvatar.userData.armed = true;
+             }
+//
+             laserLight.color = new THREE.Color(0x00ff00);
+//
+             if ( !(shootedEnemy == undefined) )
+             {
+                 if (shootedEnemy.type == "SkinnedMesh")
+                 {
+                     for (var i = 0; i < shootedEnemy.material.materials.length; i ++) 
+                     {
+                         shootedEnemy.material.materials[i].color.setHex( 0xffeeee );
+                     }
+                 }
+             }
+        }
+//
+        //var intersection;
+        function onDocumentMouseMove( event ) 
+        {
+            mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+            mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+            var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
+            vector.unproject( camera );
+            var ray  = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize(), near, far );
+            intersects = ray.intersectObjects( targets );
+//
+            // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT //
+            if (intersects.length == 2) 
+            { 
+                bulletmsg = "shoot target";
+            }
+            else if (intersects.length > 2)
+            {
+                if (cnt > bullets.length - 1) 
+                {
+                    bulletmsg = "empty";
+                }
+                else if (cnt < bullets.length + 1 && cnt > -1)
+                {
+                    bulletmsg = bullets.length - cnt;
+                }
+                else
+                {
+                    bulletmsg = "report bug 2b";
+                }
+            }
+            else
+            {
+                bulletmsg = "report bug 3b";
+            }
+            // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT //
+        }
+//
+        function toString(v) 
+        {
+            return "[ x: " + v.x + ", y: " + v.y + ", z: " + v.z + " ]"; 
+        }
+//
+    	function onWindowResize() 
+        {
+             camera.aspect = window.innerWidth / window.innerHeight;
+             camera.updateProjectionMatrix();
+             renderer.setSize( window.innerWidth, window.innerHeight );
+             controls.handleResize();
+    	}
+//
+    	function animate() 
+        {		
+            requestAnimationFrame( animate );
+//
+            render();
+//
+            update();
+    	}
+//
+        function render() 
+        {
+            var LSx, LSy, LSz = 0;
+            if ( intersects.length > sect )
+            {
+                if ( (intersects[sect].point.x - camera.position.x) < 0 ) { LSx = intersects[sect].point.x + 0.5; } else { LSx = intersects[sect].point.x - 0.5; }
+        		if ( (intersects[sect].point.y - camera.position.y) < 0 ) { LSy = intersects[sect].point.y + 0.5; } else { LSy = intersects[sect].point.y - 0.5; }
+        		if ( (intersects[sect].point.z - camera.position.z) < 0 ) { LSz = intersects[sect].point.z + 0.5; } else { LSz = intersects[sect].point.z - 0.5; }
+                laserLight.position.set( LSx, LSy, LSz );
+            }
+//
+            renderer.render( scene, camera );
+    	}
+//
+        function update() 
+        {
+            var debugInfo = document.getElementById( "debugInfo" );
+            var supplyInfo = document.getElementById( "supplyInfo" );
+            var population = document.getElementById( "population" );
+            var controlsInfo = document.getElementById( "controlsInfo" );
+            var enterInfo = document.getElementById( "enterInfo" );
+//
+            var delta = clock.getDelta();
+            var	time = clock.getElapsedTime() * 5;
+//
+    	    keyboard.update( delta * speed );
+//
+            controls.update( delta * speed );
+//
+            avatarHelper.update();
+//
+            DOME.position.copy(myAvatar.position);
+/*
+            var raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera( mouse, camera );
+            intersects = raycaster.intersectObjects( targets );
+            if ( intersects.length > 1 ) 
+            {
+                mouseHelper.position.copy(intersects[1].point);
+                normals = intersects[1].face.normal.clone();
+                normals.copy(intersects[1].point);
+                normals.multiplyScalar(2);
+                line.geometry.vertices[0].copy( intersects[1].point );
+				line.geometry.vertices[1].copy( normals );
+				line.geometry.verticesNeedUpdate = true;
+            }
+*/
+            var cameraUnprojected = new THREE.Vector3();
+            var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
+            cameraUnprojected = vector.unproject( camera );
+            var ray  = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize(), near, far );
+            intersects = ray.intersectObjects( targets );
+//
+            if ( intersects.length > sect ) debugInfo.innerHTML = bulletmsg;
+            if ( intersects.length <= sect ) debugInfo.innerHTML = "report bug 4";
+//
+            userSphere.quaternion.copy(camera.quaternion);
+            userSphere.position.copy(camera.position);
+            cameraFrontPlane.quaternion.copy(camera.quaternion);
+            cameraFrontPlane.position.copy(camera.position);
+//
+            if (intersects.length > 1) arrow.position.copy( intersects[0].point );
+            if (intersects.length == 1) arrow.position.copy( intersects[0].point );
+            if (intersects.length < 1) arrow.position.copy( cameraFrontPlane.position );
+            arrow.lookAt( myAvatar.position );
+//
+            if (!myAvatar.userData.armed) reloadButton.visible = true;
+            if ( myAvatar.userData.armed) reloadButton.visible = false;
+            reloadButton.rotation.x += delta * speed;
+            reloadButton.rotation.y += delta * speed;
+            reloadButton.rotation.z += delta * speed;
+            reloadButton.position.x = intersects[0].point.x;
+            reloadButton.position.y = intersects[0].point.y;
+            reloadButton.position.z = intersects[0].point.z;
+//
+            material_sphere1.color.setHSL( 0.0, 0.3 + 0.7 * ( 0.1 + Math.cos( time * 0.8 ) ) / 2, 0.5 );
+    	    material_sphere2.color.setHSL( 0.1, 0.3 + 0.7 * ( 0.1 + Math.sin( time * 0.5 ) ) / 2, 0.5 );
+//
+            crosshairCursor();
+//
+            if ( keyboard.down("X") ) 
+            { 
+                machinegun = true; 
+                laserLight.color = new THREE.Color( 0xff0000 ); 
+            }
+            if ( keyboard.pressed("X") ) 
+            {
+                onDocumentMouseDown(event);
+                onDocumentMouseUp( event );
+            }
+            if ( keyboard.up("X") )
+            { 
+                machinegun = false; 
+                laserLight.color = new THREE.Color( 0x00ff00 );
+            }
+//
+            if ( keyboard.down("Z") ) onDocumentMouseDown(event);
+            if ( keyboard.up("Z") ) onDocumentMouseUp( event );
+//
+            if ( keyboard.up("U") ) myAvatar.visible = !myAvatar.visible;
+//
+            if ( keyboard.up("O") ) controlsInfo.hidden = !controlsInfo.hidden;
+//
+            if ( keyboard.up("I") )
+            {
+                debugInfo.hidden = !debugInfo.hidden;
+                supplyInfo.hidden = !supplyInfo.hidden;
+                population.hidden = !population.hidden;
+                controlsInfo.hidden = !controlsInfo.hidden;
+                arrow.visible = !arrow.visible;
+            }
+//
+            if ( keyboard.up("enter") )
+            {
+                controls.enabled = true;
+                enterInfo.hidden = true;
+            }
+//
+            if ( keyboard.up("Q") ) 
+            { 
+                controls.enabled = !controls.enabled; 
+                enterInfo.hidden = true; 
+            }
+//
+       	    if ( keyboard.up("C") ) 
+            {
+                myAvatar.userData.supplyOfBullets -= cnt ;
+                supplyInfo.innerHTML = "ammo: " + myAvatar.userData.supplyOfBullets ;
+                cnt = 0 ;
+                myAvatar.userData.armed = true;
+                myAvatar.visible = false;
+                // myAvatar.visible = !myAvatar.userData.armed;
+                bulletmsg = bullets.length - cnt;
+                debugInfo.innerHTML = bulletmsg ;
+                reloadText.visible = false;
+                initOtherUsersAvatar();
+            }
+//
+            if ( keyboard.up("0") ) 
+            {
+                for ( var i = 0; i < othersAvatarSkins.length; i++ ) 
+                {
+                    othersAvatarSkins[i].userData.supplyOfBullets = supplyOfBullets;
+                    for ( var j=0; j < othersAvatarSkins[i].material.materials.length; j++ ) othersAvatarSkins[i].material.materials[j].color.setHex( 0xddffcc );
+                }
+            }
+//
+            supplyInfo.innerHTML = "ammo: " + myAvatar.userData.supplyOfBullets ;
+            population.innerHTML = "population: " + (1 + othersAvatarSkins.length) ;
+//
+            THREE.AnimationHandler.update( delta * speed );
+//
+            // ENEMY LOGIC
+
+            for ( var i = 0; i < othersAvatarSkins.length; i++ )
+                {
+                    var moveDistance = othersAvatarSkins[i].userData.delta * delta ;     // pixels per second
+                    if (  zforward ) othersAvatarSkins[i].translateZ(  moveDistance );   // +x moving // zforward = true;
+                    if (! zforward ) othersAvatarSkins[i].translateZ( -moveDistance );   // -x moving // zforward = false;
+                    if (  xforward ) othersAvatarSkins[i].translateX( -moveDistance );   // +z moving // xforward = true;
+                    if (! xforward ) othersAvatarSkins[i].translateX(  moveDistance );   // -z moving // xforward = false;
+//
+                    othersAvatarSkins[i].lookAt( directionRandomPoints[i] );
+//
+                    if ( othersAvatarSkins[i].userData.supplyOfBullets < 1 ) othersAvatarSkins[i].userData.armed = false;
+                    else othersAvatarSkins[i].userData.armed = true;
+//
+                    for ( var j=0; j < othersAvatarSkins[i].material.materials.length; j++ ) 
+                    {
+                        if (  (othersAvatarSkins[i].userData.supplyOfBullets < 15) ) othersAvatarSkins[i].material.materials[j].color.setHex( 0xffff99 );
+                        if (  (othersAvatarSkins[i].userData.supplyOfBullets < 10) ) othersAvatarSkins[i].material.materials[j].color.setHex( 0xd98376 );
+                        if (  (othersAvatarSkins[i].userData.supplyOfBullets <  5) ) othersAvatarSkins[i].material.materials[j].color.setHex( 0xa046c9 );
+//
+                        if ( !(othersAvatarSkins[i].userData.armed) ) othersAvatarSkins[i].material.materials[j].color.setHex( 0x2a52be );  // not armed.
+                        if ( !(othersAvatarSkins[i].userData.armed) ) othersAvatarSkins[i].material.materials[j].transparent = true;        // not armed.
+                        if ( !(othersAvatarSkins[i].userData.armed) ) othersAvatarSkins[i].material.materials[j].opacity = 0.5;             // not armed.
+//
+                        if (  (othersAvatarSkins[i].userData.armed) ) othersAvatarSkins[i].material.materials[j].transparent = false;       // armed.
+                        if (  (othersAvatarSkins[i].userData.armed) ) othersAvatarSkins[i].material.materials[j].opacity = 1;               // armed.
+                    }
+//
+                    if ( Math.ceil( othersAvatarSkins[i].position.x ) == directionRandomPoints[i].x || Math.ceil(othersAvatarSkins[i].position.z) == directionRandomPoints[i].z )
+                    {
+                        directionRandomPoints[i] = new THREE.Vector3(THREE.Math.randInt( -200, 200 ), othersAvatarSkins[i].position.y, THREE.Math.randInt( -200, 200 ) );
+                    }
+                }
+//
+            var sect0 = new THREE.Vector3(intersects[0].point.x, myAvatar.position.y, intersects[0].point.z);
+            var sect1 = new THREE.Vector3(intersects[intersects.length - 1].point.x, myAvatar.position.y, intersects[intersects.length - 1].point.z);
+            myAvatar.position.copy( sect0 );
+            myAvatar.lookAt( sect1 );
+//
+        }
+//
+        function clickToReload()
+        {
+            var debugInfo = document.getElementById( "debugInfo" );
+            var supplyInfo = document.getElementById( "supplyInfo" );
+            myAvatar.userData.supplyOfBullets -= cnt ;
+            supplyInfo.innerHTML = "ammo: " + myAvatar.userData.supplyOfBullets ;
+            cnt = 0 ;
+            myAvatar.userData.armed = true;
+            myAvatar.visible = false;
+            myAvatar.visible = !myAvatar.userData.armed;
+            bulletmsg = bullets.length - cnt;
+            debugInfo.innerHTML = bulletmsg ;
+            reloadText.visible = false;
+            reloadButton.visible = false;
+            initOtherUsersAvatar();
+        }
+//
+        function crosshairCursor()
+        {
+            document.getElementById("container").style.cursor = "crosshair";
+        }
+//
+    </script>
+
+    <div id="controlsInfo" style="position:absolute; background-color:#000000; opacity:0.7; right:10px; top:10px; border-radius:10px; padding:0px 5px 2px 5px; text-align:right; font-size:0.8em;">
+        <br>
+        PRESS "O" TO SHOW / HIDE INFO <br>
+        PRESS "I" TO SHOW / HIDE GUI <br><br>
+        Move LEFT = "A" <br>
+        Move BACKWARD = "S" <br>
+        Move RIGHT = "D" <br>
+        Move FORWARD = "W" <br>
+        Move UP = "R" <br>
+        Move DOWN = "F" <br><br>
+        SHOOT + FORWARD = "LEFT CLICK" <br>
+        SHOOT + BACKWARD = "RIGHT CLICK" <br><br>
+        JUST SHOOT = "Z" <br>
+        MACHINE GUN = "X" <br><br>
+        RELOAD / ADD ENEMY = "C" <br>
+        RE-ARM ALL ENEMIES = "0" <br>
+        SHOW / HIDE YOUR AVATAR = "U" <br><br>
+        ROTATE camera = MOUSE POINTER. <br>
+        LOCK / UNLOCK camera = "Q" <br><br>
+    </div>
+    
+    <div id="debugInfo">on debuging mode</div>
+    <div id="supplyInfo">ammo:</div>
+    <div id="population">population:</div>
+    <div id="enterInfo">press<br>enter</div>
+
+    <div id="developed" style="position:absolute; left:10px; bottom:10px; border-radius:10px; padding:0px 5px 2px 5px; text-align:left; font-size:1em;">
+        v.0.3.2-db
+    </div>
+    <!--button type="button" onclick="clickToReload();" style="position:absolute; right:45%; top:55%; font-size:1em;">Click to Reload!</button-->
+</body>
+
+</html>
