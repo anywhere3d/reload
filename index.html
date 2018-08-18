@@ -37,6 +37,37 @@
 
 <body id="container">
 
+    <div id="controlsInfo" style="position:absolute; background-color:#000000; opacity:0.7; right:10px; top:10px; border-radius:10px; padding:0px 5px 2px 5px; text-align:right; font-size:0.8em;">
+        <br>
+        PRESS "O" TO SHOW / HIDE INFO <br>
+        PRESS "I" TO SHOW / HIDE GUI <br><br>
+        Move LEFT = "A" <br>
+        Move BACKWARD = "S" <br>
+        Move RIGHT = "D" <br>
+        Move FORWARD = "W" <br>
+        Move UP = "R" <br>
+        Move DOWN = "F" <br><br>
+        SHOOT + FORWARD = "LEFT CLICK" <br>
+        SHOOT + BACKWARD = "RIGHT CLICK" <br><br>
+        JUST SHOOT = "Z" <br>
+        MACHINE GUN = "X" <br><br>
+        RELOAD / ADD ENEMY = "C" <br>
+        RE-ARM ALL ENEMIES = "0" <br>
+        SHOW / HIDE YOUR AVATAR = "U" <br><br>
+        ROTATE camera = MOUSE POINTER. <br>
+        LOCK / UNLOCK camera = "Q" <br><br>
+    </div>
+    
+    <div id="debugInfo">on debuging mode</div>
+    <div id="supplyInfo">ammo:</div>
+    <div id="population">population:</div>
+    <div id="enterInfo">press<br>enter</div>
+
+    <div id="developed" style="position:absolute; left:10px; bottom:10px; border-radius:10px; padding:0px 5px 2px 5px; text-align:left; font-size:1em;">
+        <a>v.0.3.2-db</a>
+    </div>
+    <!--button type="button" onclick="clickToReload();" style="position:absolute; right:45%; top:55%; font-size:1em;">Click to Reload!</button-->
+
     <script src="js/three.js"></script>
     <script src="js/FirstPersonControls.js"></script>
     <script src="js/Detector.js"></script>
@@ -54,23 +85,23 @@
     <script src="js/droid_serif_regular.typeface.js"></script>
     <script src="js/droid_serif_bold.typeface.js"></script>
         
-    <script>
+	<script>
 //
-      var Ball;
+      	var Ball;
 //
-      if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+      	if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 //
-      var container, debugInfo, supplyInfo;
-      var camera, helpCamera, scene, renderer;
-      var controls;
-      var nofreeze = true;
-      var helpCameraActive = false;
-      var userSphere;
-      var cameraFrontPlane;
-      var DOME;
-      var arrow;
-      var newDirectionObj;
-      var speed = 1.2;
+		var container, debugInfo, supplyInfo;
+		var camera, helpCamera, scene, renderer;
+		var controls;
+		var nofreeze = true;
+		var helpCameraActive = false;
+		var userSphere;
+		var cameraFrontPlane;
+		var DOME;
+		var arrow;
+		var newDirectionObj;
+		var speed = 1.2;
 //
     	var light, light1, light2, camLight, laserLight;
     	var material_sphere1, material_sphere2, material_usersph;
@@ -79,14 +110,14 @@
 //
     	var bullets = [];
     	var supplyOfBullets = 20;
-      var meshButtons = [];
-      var reloadButton;
-      var cnt = 0; 
+		var meshButtons = [];
+		var reloadButton;
+		var cnt = 0; 
 //
-      listener = new THREE.AudioListener();
-      soundDeath = new THREE.Audio( listener );
-      soundShot = new THREE.Audio( listener );
-    	soundSpawn = new THREE.Audio( listener );
+		listener = new THREE.AudioListener();
+		soundDeath = new THREE.Audio( listener );
+		soundShot = new THREE.Audio( listener );
+		soundSpawn = new THREE.Audio( listener );
     	soundThunder = new THREE.Audio( listener );
     	soundBreak = new THREE.Audio( listener );
 //
@@ -95,51 +126,50 @@
     	var ballPoint;
     	var normals;
 //     
-      var keyboard = new KeyboardState();
-      var clock = new THREE.Clock();
+		var keyboard = new KeyboardState();
+		var clock = new THREE.Clock();
 //
-      var reloadText = new THREE.Mesh();
-      var reloadTextGeom;
-      var reloadTextWidth;
-      var reloadText;
+		var reloadText = new THREE.Mesh();
+		var reloadTextGeom;
+		var reloadTextWidth;
+		var reloadText;
 //
-      var targets = [];
-      var projector;
-      var raycaster;
-      var mouse = new THREE.Vector2();
-      var spheres = [];
-      var spheresIndex = 0;
+		var targets = [];
+		var projector;
+		var raycaster;
+		var mouse = new THREE.Vector2();
+		var spheres = [];
+		var spheresIndex = 0;
 //
-     	var sect = 1;
-      var intersects = [];
+		var sect = 1;
+		var intersects = [];
 //
-      var morphs = [];
-      var skins = [];
-      var othersAvatarSkins = [];
-      var directionRandomPoints = [];
-      var animation;
-      var avatarHelper;
-      var myAvatar;
-      var shootedEnemy = undefined;
-      var othersAvatar;
-      var xforward = true;
-      var zforward = true;
+		var morphs = [];
+		var skins = [];
+		var othersAvatarSkins = [];
+		var directionRandomPoints = [];
+		var animation;
+		var avatarHelper;
+		var myAvatar;
+		var shootedEnemy = undefined;
+		var othersAvatar;
+		var xforward = true;
+		var zforward = true;
 //
 //
         ////////////////////////////////////////////////////////////////////
         // RUNTIME //
         ////////////////////////////////////////////////////////////////////
 //
-            init();
+		init();
 //
-            animate();
+		animate();
 //
         ////////////////////////////////////////////////////////////////////
         // END OF RUNTIME //
         ////////////////////////////////////////////////////////////////////
 //
-        function init() 
-        {
+        function init(){
             container = document.getElementById( "container" );
             debugInfo = document.getElementById( "debugInfo" );
             supplyInfo = document.getElementById( "supplyInfo" );
@@ -211,8 +241,7 @@
             var s = 2;
             var object;
             var loader = new THREE.JSONLoader(); 
-            loader.load( "models/user-sphere.js", function(geometry, materials) 
-            {
+            loader.load( "models/user-sphere.js", function(geometry, materials){
                  var material = new THREE.MeshFaceMaterial( materials );
                  object = new THREE.Mesh( geometry, material_helpers );
                  object.name = "USER_SPHERE" ;
@@ -224,8 +253,7 @@
                  userSphere = scene.children[scene.children.length - 1];;
             });
 //
-            loader.load( "models/cameraFrontPlane.js", function(geometry, materials) 
-            {
+            loader.load( "models/cameraFrontPlane.js", function(geometry, materials){
                  var material = new THREE.MeshFaceMaterial( materials );
                  object = new THREE.Mesh( geometry, material_helpers );
                  object.name = "CAMERA_F_PLANE" ;
@@ -237,8 +265,7 @@
                  targets.push(cameraFrontPlane);
             });
 //
-            loader.load( "models/arrow.js", function(geometry, materials) 
-            {
+            loader.load( "models/arrow.js", function(geometry, materials){
                  var material = new THREE.MeshFaceMaterial(materials);
                  object = new THREE.Mesh(geometry, material);
                  object.name = "DIRECTION_ARROW";
@@ -249,8 +276,7 @@
                  arrow = scene.children[scene.children.length - 1];
             });
 //
-    	    for (var i = 0; i < supplyOfBullets; i++)
-    	    {
+    	    for (var i = 0; i < supplyOfBullets; i++){
         		var bullet = new THREE.Mesh( new THREE.SphereGeometry( 0.3, 16, 8 ), material_bullets );
         		bullet.name = "BULLET_" + i ;
         		bullet.position.set( 0, 0, 0 );
@@ -308,8 +334,7 @@
 //
             var mybullet;
             var loader = new THREE.JSONLoader(); 
-            loader.load( "models/bullet.js", function(geometry, materials) 
-            {
+            loader.load( "models/bullet.js", function(geometry, materials){
                 var material = new THREE.MeshFaceMaterial(materials);
                 var object = new THREE.Mesh(geometry, material);
                 object.name = "RELOAD_BULLET";
@@ -319,8 +344,7 @@
                 scene.add(object);
                 mybullet = scene.children[scene.children.length - 1];
 //
-                for ( var i = 0; i < 20; i ++ ) 
-                {
+                for ( var i = 0; i < 20; i ++ ){
         		    var object = mybullet.clone();
         		    object.position.z = ( i % 5 ) * 0.9 - 1.8;
         		    object.position.x = Math.floor( i / 5 ) * 0.9 - 1.8;
@@ -337,8 +361,7 @@
             var object;
             var loader = new THREE.JSONLoader();
 //
-            loader.load( "models/department-store.js", function(geometry, materials) 
-            {
+            loader.load( "models/department-store.js", function(geometry, materials){
                  var material = new THREE.MeshFaceMaterial(materials);
                  object = new THREE.Mesh(geometry, material);
                  object.name = "department-store";
@@ -349,8 +372,7 @@
                  targets.push(object);
             });
 //
-            loader.load( "models/office_building_500.js", function(geometry, materials) 
-            {
+            loader.load( "models/office_building_500.js", function(geometry, materials){
                  var material = new THREE.MeshFaceMaterial(materials);
                  object = new THREE.Mesh(geometry, material);
                  object.name = "office-building";
@@ -361,8 +383,7 @@
                  targets.push(object);
             });
 //
-            loader.load( "models/barcelona-pavilion.js", function(geometry, materials) 
-            {
+            loader.load( "models/barcelona-pavilion.js", function(geometry, materials){
                  var material = new THREE.MeshFaceMaterial(materials);
                  object = new THREE.Mesh(geometry, material);
                  object.name = "barcelona-pavilion";
@@ -373,8 +394,7 @@
                  targets.push(object);
             });
 //
-            loader.load( "models/robie-house.js", function(geometry, materials) 
-            {
+            loader.load( "models/robie-house.js", function(geometry, materials){
                  var material = new THREE.MeshFaceMaterial(materials);
                  object = new THREE.Mesh(geometry, material_doubleSide);
                  object.name = "robie-house";
@@ -397,8 +417,7 @@
                  targets.push(object);
             });
 //
-            loader.load( "models/villa-savoye.js", function(geometry, materials) 
-            {
+            loader.load( "models/villa-savoye.js", function(geometry, materials){
                  var material = new THREE.MeshFaceMaterial(materials);
                  object = new THREE.Mesh(geometry, material_doubleSide);
                  object.name = "villa-savoye";
@@ -409,8 +428,7 @@
                  targets.push(object);
             });
 
-            loader.load( "models/hotshot-building.js", function(geometry, materials) 
-            {
+            loader.load( "models/hotshot-building.js", function(geometry, materials){
                  var material = new THREE.MeshFaceMaterial(materials);
                  object = new THREE.Mesh(geometry, material);
                  object.name = "hotshot-building";
@@ -425,80 +443,70 @@
         	var materialSide = new THREE.MeshBasicMaterial( { color: 0x999999 } );
         	var materialArray = [ materialFace, materialSide ];
 //
-        	h0Style =  
-                {
+        	h0Style =  {
         		size: 40, height: 2, curveSegments: 10,
         		font: "helvetiker", weight: "normal", style: "normal",
         		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
         		material: 0, extrudeMaterial: 1
-        	}
+        	};
 //
-        	h1Style = 
-                {
+        	h1Style = {
         		size: 20, height: 1, curveSegments: 10,
         		font: "helvetiker", weight: "normal", style: "normal",
         		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
         		material: 0, extrudeMaterial: 1
-        	}
+        	};
 //
-        	h2Style = 
-                {      
+        	h2Style =  {      
         		size: 10, height: 1, curveSegments: 10,
         		font: "helvetiker", weight: "normal", style: "normal",
         		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
         		material: 0, extrudeMaterial: 1
-        	}
+        	};
 //
-        	h3Style = 
-                {      
+        	h3Style =  {      
         		size: 5, height: 0.5, curveSegments: 10,
         		font: "helvetiker", weight: "normal", style: "normal",
         		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
         		material: 0, extrudeMaterial: 1
-        	}
+        	};
 //
-        	h4Style = 
-                {      
+        	h4Style =  {      
         		size: 2.5, height: 0.4, curveSegments: 10,
         		font: "helvetiker", weight: "normal", style: "normal",
         		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
         		material: 0, extrudeMaterial: 1
-        	}
+        	};
 //
-        	h5Style = 
-                {      
+        	h5Style =  {      
         		size: 1.75, height: 0.3, curveSegments: 10,
         		font: "helvetiker", weight: "normal", style: "normal",
         		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
         		material: 0, extrudeMaterial: 1
-        	}
+        	};
 //
-        	h6Style = 
-                {      
+        	h6Style = {      
         		size: 1, height: 0.2, curveSegments: 10,
         		font: "helvetiker", weight: "normal", style: "normal",
         		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
         		material: 0, extrudeMaterial: 1
-        	}
+        	};
 //
-        	h7Style = 
-                {      
+        	h7Style =  {      
         		size: 0.5, height: 0.1, curveSegments: 10,
         		font: "helvetiker", weight: "normal", style: "normal",
         		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
         		material: 0, extrudeMaterial: 1
-        	}
+        	};
 //
-        	h8Style = 
-                {      
+        	h8Style =  {      
         		size: 0.25, height: 0.1, curveSegments: 10,
         		font: "helvetiker", weight: "normal", style: "normal",
         		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
         		material: 0, extrudeMaterial: 1
-        	}
+        	};
 //
-        	infoStyle = 
-                {
+        	infoStyle = {
         		size: 0.6, height: 0.1, curveSegments: 10,
         		font: "helvetiker", weight: "normal", style: "normal",
         		bevelThickness: 1, bevelSize: 2, bevelEnabled: false,
@@ -618,10 +626,8 @@
         }           // end of inti() //
         /////////////////////////////////////////////////////////////////////////////////////////////
 //
-        function ensureLoop( animation ) 
-        {
-    	    for ( var i = 0; i < animation.hierarchy.length; i ++ ) 
-            {
+        function ensureLoop( animation ){
+    	    for ( var i = 0; i < animation.hierarchy.length; i ++ ){
                 var bone = animation.hierarchy[ i ];
                 var first = bone.keys[ 0 ];
                 var last = bone.keys[ bone.keys.length - 1 ];
@@ -738,8 +744,7 @@
 			});
         }
 //
-        function createNewBullet()
-        {
+        function createNewBullet(){
     	    var bullet = new THREE.Mesh( new THREE.SphereGeometry( 0.3, 16, 8 ), material_bullets );
     	    bullet.name = "BULLET_" + bullets.length ;
     	    bullet.position.set( 0, 0, 0 );
@@ -756,24 +761,17 @@
         var far = Infinity;
         var machinegun = false;
 //
-        function onDocumentMouseDown( event ) 
-        {
+        function onDocumentMouseDown( event ){
             
-            if (cnt < bullets.length && cnt > -1)
-            {
-                if (machinegun)
-                {
+            if (cnt < bullets.length && cnt > -1){
+                if (machinegun){
                     soundShot.play();
                     soundShot.onEnded();
-                }
-                else
-                {
+                } else {
                     soundBreak.play();
                     soundBreak.onEnded();
                 }
-            }
-            else
-            {
+            } else {
                 soundSpawn.play();
                 soundSpawn.onEnded();
             }
@@ -786,12 +784,10 @@
 //
             intersects = ray.intersectObjects( targets );
             // DO NOT EDIT
-            if ( intersects.length > sect )
-            {
+            if ( intersects.length > sect ){
                 laserLight.color = new THREE.Color(0xff0000);
 //
-                if (cnt < bullets.length && cnt > -1)
-                {
+                if (cnt < bullets.length && cnt > -1){
                     myAvatar.userData.shootedObj = intersects[sect];
                     bullets[cnt].visible = false;
                     bullets[cnt].position.copy( intersects[sect].point );
@@ -811,8 +807,7 @@
             }
         }
 //
-        function onDocumentMouseUp( event ) 
-        {
+        function onDocumentMouseUp( event ){
 //
             //mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
             //mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
@@ -829,83 +824,71 @@
             }
 */
            intersects = ray.intersectObjects( targets );
-            if ( intersects.length == 2 )
-//
-            {
-                if (cnt > bullets.length - 1) 
-                {
+            if ( intersects.length == 2 ){
+
+                if (cnt > bullets.length - 1){
                     bulletmsg = "empty";
                     reloadText.quaternion.copy( camera.quaternion );
                     reloadText.position.copy( intersects[0].point );
                     reloadText.visible = true;
                     vector.unproject( reloadText );
                     myAvatar.visible = true;
-                }
-                else if (cnt < bullets.length + 1 && cnt > -1)
-                {
+
+                } else if (cnt < bullets.length + 1 && cnt > -1){
                     bullets[cnt].visible = true;
                     bulletmsg = bullets.length - cnt;
-                }
-                else
-                {
+
+                } else {
                     bulletmsg = "report bug 1a";
+
                 }
-            }
-//
-            else if ( intersects.length > sect )
-//
-            {
-                if (cnt > bullets.length - 1) 
-                {
+
+            } else if ( intersects.length > sect ) {
+
+                if (cnt > bullets.length - 1) {
                     bulletmsg = "empty";
                     reloadText.quaternion.copy( camera.quaternion );
                     reloadText.position.copy( intersects[0].point );
                     reloadText.visible = true;
                     vector.unproject( reloadText );
                     cnt = -1;
-                }
-                else if (cnt < bullets.length + 1 && cnt > -1)
-                {
+
+                }  else if (cnt < bullets.length + 1 && cnt > -1) {
                     bullets[cnt].visible = true;
 //
                     if (myAvatar.userData.shootedObj.object.type == "SkinnedMesh") {
                         if (myAvatar.userData.shootedObj.object.userData.enemy) {
                             if (myAvatar.userData.shootedObj.object.userData.armed) {
                                 // add some code to do something when you hit enemy ???
-                    }   }   }
-                    else 
-                    { 
+                    		}   
+						}
+
+					} else  { 
                         cnt++ ; 
                     }
 //
                     bulletmsg = bullets.length - cnt;
-                }
-                else
-                {
+
+                } else {
                     bulletmsg = "report bug 1b";
                 }
 //
              }
 //
-             if (cnt > bullets.length -1) 
-             {
+             if (cnt > bullets.length -1) {
                  myAvatar.visible = true;
                  myAvatar.userData.armed = false;
              }
-             if (cnt < bullets.length && cnt > -1) 
-             {
+             if (cnt < bullets.length && cnt > -1) {
                  myAvatar.visible = false;
                  myAvatar.userData.armed = true;
              }
 //
              laserLight.color = new THREE.Color(0x00ff00);
 //
-             if ( !(shootedEnemy == undefined) )
-             {
-                 if (shootedEnemy.type == "SkinnedMesh")
-                 {
-                     for (var i = 0; i < shootedEnemy.material.materials.length; i ++) 
-                     {
+             if ( !(shootedEnemy == undefined) ) {
+                 if (shootedEnemy.type == "SkinnedMesh") {
+                     for (var i = 0; i < shootedEnemy.material.materials.length; i ++) {
                          shootedEnemy.material.materials[i].color.setHex( 0xffeeee );
                      }
                  }
@@ -913,8 +896,7 @@
         }
 //
         //var intersection;
-        function onDocumentMouseMove( event ) 
-        {
+        function onDocumentMouseMove( event ){
             mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
             mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
             var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
@@ -923,47 +905,37 @@
             intersects = ray.intersectObjects( targets );
 //
             // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT //
-            if (intersects.length == 2) 
-            { 
+            if (intersects.length == 2) { 
                 bulletmsg = "shoot target";
-            }
-            else if (intersects.length > 2)
-            {
-                if (cnt > bullets.length - 1) 
-                {
+
+            } else if (intersects.length > 2) {
+
+                if (cnt > bullets.length - 1) {
                     bulletmsg = "empty";
-                }
-                else if (cnt < bullets.length + 1 && cnt > -1)
-                {
+                } else if (cnt < bullets.length + 1 && cnt > -1) {
                     bulletmsg = bullets.length - cnt;
-                }
-                else
-                {
+                } else {
                     bulletmsg = "report bug 2b";
                 }
-            }
-            else
-            {
+
+            } else {
                 bulletmsg = "report bug 3b";
             }
             // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT //
         }
 //
-        function toString(v) 
-        {
+        function toString(v){
             return "[ x: " + v.x + ", y: " + v.y + ", z: " + v.z + " ]"; 
         }
 //
-    	function onWindowResize() 
-        {
+    	function onWindowResize(){
              camera.aspect = window.innerWidth / window.innerHeight;
              camera.updateProjectionMatrix();
              renderer.setSize( window.innerWidth, window.innerHeight );
              controls.handleResize();
     	}
 //
-    	function animate() 
-        {		
+    	function animate(){		
             requestAnimationFrame( animate );
 //
             render();
@@ -971,8 +943,7 @@
             update();
     	}
 //
-        function render() 
-        {
+        function render(){
             var LSx, LSy, LSz = 0;
             if ( intersects.length > sect )
             {
@@ -985,8 +956,7 @@
             renderer.render( scene, camera );
     	}
 //
-        function update() 
-        {
+        function update(){
             var debugInfo = document.getElementById( "debugInfo" );
             var supplyInfo = document.getElementById( "supplyInfo" );
             var population = document.getElementById( "population" );
@@ -1051,18 +1021,17 @@
 //
             crosshairCursor();
 //
-            if ( keyboard.down("X") ) 
-            { 
+            if ( keyboard.down("X") ) { 
                 machinegun = true; 
                 laserLight.color = new THREE.Color( 0xff0000 ); 
             }
-            if ( keyboard.pressed("X") ) 
-            {
+
+            if ( keyboard.pressed("X") ) {
                 onDocumentMouseDown(event);
                 onDocumentMouseUp( event );
             }
-            if ( keyboard.up("X") )
-            { 
+
+            if ( keyboard.up("X") ) { 
                 machinegun = false; 
                 laserLight.color = new THREE.Color( 0x00ff00 );
             }
@@ -1074,8 +1043,7 @@
 //
             if ( keyboard.up("O") ) controlsInfo.hidden = !controlsInfo.hidden;
 //
-            if ( keyboard.up("I") )
-            {
+            if ( keyboard.up("I") ) {
                 debugInfo.hidden = !debugInfo.hidden;
                 supplyInfo.hidden = !supplyInfo.hidden;
                 population.hidden = !population.hidden;
@@ -1083,20 +1051,17 @@
                 arrow.visible = !arrow.visible;
             }
 //
-            if ( keyboard.up("enter") )
-            {
+            if ( keyboard.up("enter") ) {
                 controls.enabled = true;
                 enterInfo.hidden = true;
             }
 //
-            if ( keyboard.up("Q") ) 
-            { 
+            if ( keyboard.up("Q") ) { 
                 controls.enabled = !controls.enabled; 
                 enterInfo.hidden = true; 
             }
 //
-       	    if ( keyboard.up("C") ) 
-            {
+       	    if ( keyboard.up("C") ) {
                 myAvatar.userData.supplyOfBullets -= cnt ;
                 supplyInfo.innerHTML = "ammo: " + myAvatar.userData.supplyOfBullets ;
                 cnt = 0 ;
@@ -1109,10 +1074,8 @@
                 initOtherUsersAvatar();
             }
 //
-            if ( keyboard.up("0") ) 
-            {
-                for ( var i = 0; i < othersAvatarSkins.length; i++ ) 
-                {
+            if ( keyboard.up("0") ) {
+                for ( var i = 0; i < othersAvatarSkins.length; i++ ) {
                     othersAvatarSkins[i].userData.supplyOfBullets = supplyOfBullets;
                     for ( var j=0; j < othersAvatarSkins[i].material.materials.length; j++ ) othersAvatarSkins[i].material.materials[j].color.setHex( 0xddffcc );
                 }
@@ -1125,8 +1088,7 @@
 //
             // ENEMY LOGIC
 
-            for ( var i = 0; i < othersAvatarSkins.length; i++ )
-                {
+            for ( var i = 0; i < othersAvatarSkins.length; i++ ) {
                     var moveDistance = othersAvatarSkins[i].userData.delta * delta ;     // pixels per second
                     if (  zforward ) othersAvatarSkins[i].translateZ(  moveDistance );   // +x moving // zforward = true;
                     if (! zforward ) othersAvatarSkins[i].translateZ( -moveDistance );   // -x moving // zforward = false;
@@ -1138,8 +1100,7 @@
                     if ( othersAvatarSkins[i].userData.supplyOfBullets < 1 ) othersAvatarSkins[i].userData.armed = false;
                     else othersAvatarSkins[i].userData.armed = true;
 //
-                    for ( var j=0; j < othersAvatarSkins[i].material.materials.length; j++ ) 
-                    {
+                    for ( var j=0; j < othersAvatarSkins[i].material.materials.length; j++ ) {
                         if (  (othersAvatarSkins[i].userData.supplyOfBullets < 15) ) othersAvatarSkins[i].material.materials[j].color.setHex( 0xffff99 );
                         if (  (othersAvatarSkins[i].userData.supplyOfBullets < 10) ) othersAvatarSkins[i].material.materials[j].color.setHex( 0xd98376 );
                         if (  (othersAvatarSkins[i].userData.supplyOfBullets <  5) ) othersAvatarSkins[i].material.materials[j].color.setHex( 0xa046c9 );
@@ -1152,8 +1113,7 @@
                         if (  (othersAvatarSkins[i].userData.armed) ) othersAvatarSkins[i].material.materials[j].opacity = 1;               // armed.
                     }
 //
-                    if ( Math.ceil( othersAvatarSkins[i].position.x ) == directionRandomPoints[i].x || Math.ceil(othersAvatarSkins[i].position.z) == directionRandomPoints[i].z )
-                    {
+                    if ( Math.ceil( othersAvatarSkins[i].position.x ) == directionRandomPoints[i].x || Math.ceil(othersAvatarSkins[i].position.z) == directionRandomPoints[i].z ) {
                         directionRandomPoints[i] = new THREE.Vector3(THREE.Math.randInt( -200, 200 ), othersAvatarSkins[i].position.y, THREE.Math.randInt( -200, 200 ) );
                     }
                 }
@@ -1165,8 +1125,7 @@
 //
         }
 //
-        function clickToReload()
-        {
+        function clickToReload(){
             var debugInfo = document.getElementById( "debugInfo" );
             var supplyInfo = document.getElementById( "supplyInfo" );
             myAvatar.userData.supplyOfBullets -= cnt ;
@@ -1182,43 +1141,11 @@
             initOtherUsersAvatar();
         }
 //
-        function crosshairCursor()
-        {
+        function crosshairCursor(){
             document.getElementById("container").style.cursor = "crosshair";
         }
 //
     </script>
 
-    <div id="controlsInfo" style="position:absolute; background-color:#000000; opacity:0.7; right:10px; top:10px; border-radius:10px; padding:0px 5px 2px 5px; text-align:right; font-size:0.8em;">
-        <br>
-        PRESS "O" TO SHOW / HIDE INFO <br>
-        PRESS "I" TO SHOW / HIDE GUI <br><br>
-        Move LEFT = "A" <br>
-        Move BACKWARD = "S" <br>
-        Move RIGHT = "D" <br>
-        Move FORWARD = "W" <br>
-        Move UP = "R" <br>
-        Move DOWN = "F" <br><br>
-        SHOOT + FORWARD = "LEFT CLICK" <br>
-        SHOOT + BACKWARD = "RIGHT CLICK" <br><br>
-        JUST SHOOT = "Z" <br>
-        MACHINE GUN = "X" <br><br>
-        RELOAD / ADD ENEMY = "C" <br>
-        RE-ARM ALL ENEMIES = "0" <br>
-        SHOW / HIDE YOUR AVATAR = "U" <br><br>
-        ROTATE camera = MOUSE POINTER. <br>
-        LOCK / UNLOCK camera = "Q" <br><br>
-    </div>
-    
-    <div id="debugInfo">on debuging mode</div>
-    <div id="supplyInfo">ammo:</div>
-    <div id="population">population:</div>
-    <div id="enterInfo">press<br>enter</div>
-
-    <div id="developed" style="position:absolute; left:10px; bottom:10px; border-radius:10px; padding:0px 5px 2px 5px; text-align:left; font-size:1em;">
-        <a>v.0.3.2-db</a>
-    </div>
-    <!--button type="button" onclick="clickToReload();" style="position:absolute; right:45%; top:55%; font-size:1em;">Click to Reload!</button-->
 </body>
-
 </html>
