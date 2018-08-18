@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
     <script src="//code.jquery.com/jquery-1.10.2.js"></script>
     <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
-    
 
     <title>Reload-3D FPS</title>
 
@@ -131,24 +130,16 @@
         // RUNTIME //
         ////////////////////////////////////////////////////////////////////
 //
-//
             init();
 //
             animate();
-//
 //
         ////////////////////////////////////////////////////////////////////
         // END OF RUNTIME //
         ////////////////////////////////////////////////////////////////////
 //
-//
         function init() 
-        /////////////////////////////////////////////////////////////////////////////////////////////
-        {           // start of inti() //
-        /////////////////////////////////////////////////////////////////////////////////////////////
-
-            //var debugInfo = document.getElementById( "debugInfo" );
-        
+        {
             container = document.getElementById( "container" );
             debugInfo = document.getElementById( "debugInfo" );
             supplyInfo = document.getElementById( "supplyInfo" );
@@ -194,8 +185,6 @@
             material_usersph = new THREE.MeshLambertMaterial( { color: 0x99ff00, shading: THREE.SmoothShading } );
             material_bullets = new THREE.MeshLambertMaterial( { color: 0xff0000, shading: THREE.SmoothShading } );
             material_doubleSide = new THREE.MeshLambertMaterial( { color: 0xaaaaaa, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
-            // faceColorMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, vertexColors: THREE.FaceColors } );
-            // material_bullets = new THREE.MeshBasicMaterial( { color: 0xff0000, vertexColors: THREE.FaceColors } );
             material_helpers = new THREE.MeshBasicMaterial( { color: 0x88ff00, wireframe: true, transparent: true } );
 //
             soundDeath.load( 'sounds/death.ogg' );
@@ -218,7 +207,6 @@
             DOME.scale.set(10, 5, 10);
             scene.add( DOME );
             targets.push(DOME);
-//
 //
             var s = 2;
             var object;
@@ -260,7 +248,6 @@
                  scene.add(object);
                  arrow = scene.children[scene.children.length - 1];
             });
-//
 //
     	    for (var i = 0; i < supplyOfBullets; i++)
     	    {
@@ -518,7 +505,6 @@
         		material: 0, extrudeMaterial: 1
         	};
 //
-//
             var info0Geom = new THREE.TextGeometry( "CONTROLS:", infoStyle );
         	var info1Geom = new THREE.TextGeometry( "A S D W = Move left, back, right, front.", infoStyle );
         	var info2Geom = new THREE.TextGeometry( "LEFT CLICK = Forward.", infoStyle );
@@ -645,18 +631,16 @@
     	    }
     	}
 //
-        function initOtherUsersAvatar()
-        {
+        function initOtherUsersAvatar(){
+			
     	    var loader = new THREE.JSONLoader();
 //
-    	    loader.load( "models/human_walk_0_female.js", function ( geometry, materials ) 
-            {
+    	    loader.load( "models/human_walk_0_female.js", function ( geometry, materials ){
             	geometry.computeVertexNormals();
             	geometry.computeBoundingBox();
             	ensureLoop( geometry.animation );
 //
-            	for ( var i = 0, il = materials.length; i < il; i ++ ) 
-                {
+            	for ( var i = 0, il = materials.length; i < il; i ++ ){
             	    var originalMaterial = materials[ i ];
             	    originalMaterial.skinning = true;
             	    originalMaterial.map = undefined;
@@ -701,64 +685,58 @@
     	    });
         }
 //
-//
-//
-//
-        function initMyAvatar() 
-        {
-	    var loader = new THREE.JSONLoader();
-//
-	    loader.load( "models/human_walk_0_female.js", function ( geometry, materials ) 
-	    {
-	        geometry.computeVertexNormals();
-	        geometry.computeBoundingBox();
-	        ensureLoop( geometry.animation );
-//
-	        for ( var i = 0, il = materials.length; i < il; i ++ ) 
-            {
-                var originalMaterial = materials[ i ];
-                originalMaterial.skinning = true;
-                originalMaterial.map = undefined;
-                originalMaterial.shading = THREE.SmoothShading;
-                originalMaterial.color.setHSL( 0.2, 0.5, 0.7 );
-                originalMaterial.specular.setHSL( 0, 0, 0.1 );
-                originalMaterial.shininess = 75;
-                originalMaterial.wrapAround = true;
-                originalMaterial.wrapRGB.set( 1, 0.5, 0.5 );
-            }
-//
-            var s = 4.5;
-            var material = new THREE.MeshFaceMaterial( materials );
-            var mesh = new THREE.SkinnedMesh( geometry, material, false );
-            mesh.scale.set( s, s, s );
-            mesh.rotation.y = Math.PI/2;
-            mesh.position.x = -150;
-            mesh.position.y = -geometry.boundingBox.min.y * s ;
-            mesh.position.z = -15;
-//
-            mesh.userData.delta = 20;
-            mesh.userData.enemy = false;
-            mesh.userData.friend = true;
-            mesh.userData.nickName = "DoubleChok";
-            mesh.userData.armed = true;
-            mesh.userData.supplyOfBullets = supplyOfBullets;
-//
-            scene.add( mesh );
-            skins.push( mesh );
-            myAvatar = scene.children[scene.children.length - 1];
-            myAvatar.visible = !myAvatar.userData.armed;
-//
-            avatarHelper = new THREE.BoundingBoxHelper( myAvatar, 0X00ff00 );
-            scene.add( avatarHelper );
-            avatarHelper.visible = false;
-//
-            animation = new THREE.Animation( mesh, geometry.animation );
-            animation.play();
-            animation.update( 0 );
-//
-	    } );
+        function initMyAvatar(){
+	//
+			var loader = new THREE.JSONLoader();
+	//
+			loader.load( "models/human_walk_0_female.js", function ( geometry, materials ){
+				geometry.computeVertexNormals();
+				geometry.computeBoundingBox();
+				ensureLoop( geometry.animation );
+	//
+				for ( var i = 0, il = materials.length; i < il; i ++ ) {
+					var originalMaterial = materials[ i ];
+					originalMaterial.skinning = true;
+					originalMaterial.map = undefined;
+					originalMaterial.shading = THREE.SmoothShading;
+					originalMaterial.color.setHSL( 0.2, 0.5, 0.7 );
+					originalMaterial.specular.setHSL( 0, 0, 0.1 );
+					originalMaterial.shininess = 75;
+					originalMaterial.wrapAround = true;
+					originalMaterial.wrapRGB.set( 1, 0.5, 0.5 );
+				}
+	//
+				var s = 4.5;
+				var material = new THREE.MeshFaceMaterial( materials );
+				var mesh = new THREE.SkinnedMesh( geometry, material, false );
+				mesh.scale.set( s, s, s );
+				mesh.rotation.y = Math.PI/2;
+				mesh.position.x = -150;
+				mesh.position.y = -geometry.boundingBox.min.y * s ;
+				mesh.position.z = -15;
+	//
+				mesh.userData.delta = 20;
+				mesh.userData.enemy = false;
+				mesh.userData.friend = true;
+				mesh.userData.nickName = "DoubleChok";
+				mesh.userData.armed = true;
+				mesh.userData.supplyOfBullets = supplyOfBullets;
+	//
+				scene.add( mesh );
+				skins.push( mesh );
+				myAvatar = scene.children[scene.children.length - 1];
+				myAvatar.visible = !myAvatar.userData.armed;
+	//
+				avatarHelper = new THREE.BoundingBoxHelper( myAvatar, 0X00ff00 );
+				scene.add( avatarHelper );
+				avatarHelper.visible = false;
+	//
+				animation = new THREE.Animation( mesh, geometry.animation );
+				animation.play();
+				animation.update( 0 );
+	//
+			});
         }
-//
 //
         function createNewBullet()
         {
@@ -832,7 +810,6 @@
                 }
             }
         }
-//
 //
         function onDocumentMouseUp( event ) 
         {
@@ -1239,7 +1216,7 @@
     <div id="enterInfo">press<br>enter</div>
 
     <div id="developed" style="position:absolute; left:10px; bottom:10px; border-radius:10px; padding:0px 5px 2px 5px; text-align:left; font-size:1em;">
-        v.0.3.2-db
+        <a>v.0.3.2-db</a>
     </div>
     <!--button type="button" onclick="clickToReload();" style="position:absolute; right:45%; top:55%; font-size:1em;">Click to Reload!</button-->
 </body>
